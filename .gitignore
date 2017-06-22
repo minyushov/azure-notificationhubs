@@ -25,3 +25,5 @@ iOS/BVT/IosSdkTests/Default.png
 iOS/BVT/IosSdkTests/Default-568h@2x.png
 
 iOS/BVT/IosSdkTests/Default@2x.png
+*.iml
+.idea
