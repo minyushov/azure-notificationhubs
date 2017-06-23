@@ -20,20 +20,18 @@ See the Apache Version 2.0 License for specific language governing permissions a
 
 package com.microsoft.windowsazure.messaging;
 
-import static com.microsoft.windowsazure.messaging.Utils.*;
-
-import com.microsoft.windowsazure.messaging.Registration.RegistrationType;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.http.message.BasicHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -41,67 +39,70 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
+import com.microsoft.windowsazure.messaging.Registration.RegistrationType;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import static com.microsoft.windowsazure.messaging.Utils.getXmlString;
+import static com.microsoft.windowsazure.messaging.Utils.isNullOrWhiteSpace;
 
 
 /**
  * The notification hub client
  */
 public class NotificationHub {
-	
+
 	/**
 	 * Prefix for Storage keys
 	 */
 	private static final String STORAGE_PREFIX = "__NH_";
-	
+
 	/**
 	 * Prefix for registration information keys in local storage
 	 */
 	private static final String REGISTRATION_NAME_STORAGE_KEY = "REG_NAME_";
-	
+
 	/**
 	 * Content-type for atom+xml requests
 	 */
 	private static final String XML_CONTENT_TYPE = "application/atom+xml";
-	
+
 	/**
 	 * Storage Version key
 	 */
 	private static final String STORAGE_VERSION_KEY = "STORAGE_VERSION";
-	
+
 	/**
 	 * Storage Version
 	 */
 	private static final String STORAGE_VERSION = "1.0.0";
-	
+
 	/**
 	 * PNS Handle Key
 	 */
 	private static final String PNS_HANDLE_KEY = "PNS_HANDLE";
-		
+
 	/**
 	 * New registration location header name
 	 */
 	private static final String NEW_REGISTRATION_LOCATION_HEADER = "Location";
-	
+
 	/**
 	 * The Notification Hub path
 	 */
 	private String mNotificationHubPath;
-	
+
 	/**
-	 * Notification Hub Connection String 
+	 * Notification Hub Connection String
 	 */
 	private String mConnectionString;
-	
+
 	/**
 	 * SharedPreferences reference used to access local storage
 	 */
 	private SharedPreferences mSharedPreferences;
-		
+
 	private boolean mIsRefreshNeeded = false;
 
 	/**
@@ -119,7 +120,7 @@ public class NotificationHub {
 		}
 
 		mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-		
+
 		verifyStorageVersion();
 	}
 
@@ -134,7 +135,7 @@ public class NotificationHub {
 		if (isNullOrWhiteSpace(pnsHandle)) {
 			throw new IllegalArgumentException("pnsHandle");
 		}
-		
+
 		Registration registration = PnsSpecificRegistrationFactory.getInstance().createNativeRegistration(mNotificationHubPath);
 		registration.setPNSHandle(pnsHandle);
 		registration.setName(Registration.DEFAULT_REGISTRATION_NAME);
@@ -161,10 +162,10 @@ public class NotificationHub {
 
 		// Changing the registration type to Baidu.
 		PnsSpecificRegistrationFactory.getInstance().setRegistrationType(RegistrationType.baidu);
-		
+
 		return this.register(userId + "-" + channelId , tags);
 	}
-	
+
 	/**
 	 * Registers the client for template notifications with the specified tags
 	 * @param pnsHandle	PNS specific identifier
@@ -178,11 +179,11 @@ public class NotificationHub {
 		if (isNullOrWhiteSpace(pnsHandle)) {
 			throw new IllegalArgumentException("pnsHandle");
 		}
-		
+
 		if (isNullOrWhiteSpace(templateName)) {
 			throw new IllegalArgumentException("templateName");
 		}
-		
+
 		if (isNullOrWhiteSpace(template)) {
 			throw new IllegalArgumentException("template");
 		}
@@ -210,15 +211,15 @@ public class NotificationHub {
 		if (isNullOrWhiteSpace(userId)) {
 			throw new IllegalArgumentException("userId");
 		}
-		
+
 		if (isNullOrWhiteSpace(channelId)) {
 			throw new IllegalArgumentException("channelId");
 		}
-		
+
 		if (isNullOrWhiteSpace(templateName)) {
 			throw new IllegalArgumentException("templateName");
 		}
-		
+
 		if (isNullOrWhiteSpace(template)) {
 			throw new IllegalArgumentException("template");
 		}
@@ -228,7 +229,7 @@ public class NotificationHub {
 
 		return this.registerTemplate(userId + "-" + channelId, templateName, template, tags);
 	}
-	
+
 	/**
 	 * Unregisters the client for native notifications
 	 * @throws Exception
@@ -246,10 +247,10 @@ public class NotificationHub {
 		if (isNullOrWhiteSpace(templateName)) {
 			throw new IllegalArgumentException("templateName");
 		}
-		
+
 		unregisterInternal(templateName);
 	}
-	
+
 	/**
 	 * Unregisters the client for all notifications
 	 * @param pnsHandle	PNS specific identifier
@@ -257,24 +258,24 @@ public class NotificationHub {
 	 */
 	public void unregisterAll(String pnsHandle) throws Exception {
 		refreshRegistrationInformation(pnsHandle);
-		
+
 		Set<String> keys = mSharedPreferences.getAll().keySet();
-		
+
 		for (String key : keys) {
 			if (key.startsWith(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY)) {
 				String registrationName = key.substring((STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY).length());
 				String registrationId = mSharedPreferences.getString(key, "");
-		
+
 				deleteRegistrationInternal(registrationName, registrationId);
 			}
 		}
 	}
-	
+
 	private void refreshRegistrationInformation(String pnsHandle) throws Exception {
 		if (isNullOrWhiteSpace(pnsHandle)) {
 			throw new IllegalArgumentException("pnsHandle");
 		}
-		
+
 		// delete old registration information
 		Editor editor = mSharedPreferences.edit();
 		Set<String> keys = mSharedPreferences.getAll().keySet();
@@ -283,9 +284,9 @@ public class NotificationHub {
 				editor.remove(key);
 			}
 		}
-		
+
 		editor.commit();
-		
+
 		// get existing registrations
 		Connection conn = new Connection(mConnectionString);
 
@@ -307,7 +308,7 @@ public class NotificationHub {
 
 		doc.getDocumentElement().normalize();
 		Element root = doc.getDocumentElement();
-		
+
 		//for each registration, parse it
 		NodeList entries = root.getElementsByTagName("entry");
 		for (int i = 0; i < entries.getLength(); i++) {
@@ -324,10 +325,10 @@ public class NotificationHub {
 
 			storeRegistrationId(registration.getName(), registration.getRegistrationId(), registration.getPNSHandle());
 		}
-		
+
 		mIsRefreshNeeded = false;
 	}
-	
+
 	/**
 	 * Gets the Notification Hub connection string
 	 */
@@ -343,7 +344,7 @@ public class NotificationHub {
 		if (isNullOrWhiteSpace(connectionString)) {
 			throw new IllegalArgumentException("connectionString");
 		}
-		
+
 		try {
 			ConnectionStringParser.parse(connectionString);
 		} catch (Exception e) {
@@ -379,31 +380,31 @@ public class NotificationHub {
 	 * @throws Exception
 	 */
 	private Registration registerInternal(Registration registration) throws Exception {
-		
+
 		if (mIsRefreshNeeded) {
 			String pNSHandle = mSharedPreferences.getString(STORAGE_PREFIX + PNS_HANDLE_KEY, "");
-			
+
 			if (isNullOrWhiteSpace(pNSHandle)) {
 				pNSHandle = registration.getPNSHandle();
 			}
-			
+
 			refreshRegistrationInformation(pNSHandle);
 		}
-		
+
 		String registrationId = retrieveRegistrationId(registration.getName());
 		if(isNullOrWhiteSpace(registrationId)){
 			registrationId = createRegistrationId();
 		}
-		
+
 		registration.setRegistrationId(registrationId);
-		
+
 		try{
 			return upsertRegistrationInternal(registration);
 		}
 		catch(RegistrationGoneException e){
 			// if we get an RegistrationGoneException (410) from service, we will recreate registration id and will try to do upsert one more time.
 		}
-		
+
 		registrationId = createRegistrationId();
 		registration.setRegistrationId(registrationId);
 		return upsertRegistrationInternal(registration);
@@ -416,12 +417,12 @@ public class NotificationHub {
 	 */
 	private void unregisterInternal(String registrationName) throws Exception {
 		String registrationId = retrieveRegistrationId(registrationName);
-		
+
 		if(!isNullOrWhiteSpace(registrationId)) {
 			deleteRegistrationInternal(registrationName, registrationId);
 		}
 	}
-	
+
 	/**
 	 * Updates a registration
 	 * @param registration	The registration to update
@@ -435,7 +436,7 @@ public class NotificationHub {
 		String content = registration.toXml();
 
 		String response = conn.executeRequest(resource, content, XML_CONTENT_TYPE, "PUT");
-		
+
 		Registration result;
 		boolean isTemplateRegistration = PnsSpecificRegistrationFactory.getInstance().isTemplateRegistration(response);
 
@@ -451,39 +452,38 @@ public class NotificationHub {
 		result.loadXml(response, mNotificationHubPath);
 
 		storeRegistrationId(result.getName(), result.getRegistrationId(), registration.getPNSHandle());
-		
+
 		return result;
-	}	
-	
+	}
+
 	private String createRegistrationId() throws Exception {
 		Connection conn = new Connection(mConnectionString);
 
 		String resource = mNotificationHubPath + "/registrationids/";
 		String response = conn.executeRequest(resource, null, XML_CONTENT_TYPE, "POST", NEW_REGISTRATION_LOCATION_HEADER);
-		
+
 		URI regIdUri = new URI(response);
 		String[] pathFragments=regIdUri.getPath().split("/");
 		String result=pathFragments[pathFragments.length-1];
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Deletes a registration and removes it from local storage
-	 * @param regInfo	The reginfo JSON object
 	 * @throws Exception
 	 */
 	private void deleteRegistrationInternal(String registrationName, String registrationId) throws Exception {
 		Connection conn = new Connection(mConnectionString);
 		String resource = mNotificationHubPath + "/Registrations/" + registrationId;
-		
+
 		try {
-			conn.executeRequest(resource, null, XML_CONTENT_TYPE, "DELETE", new BasicHeader("If-Match", "*"));
+			conn.executeRequest(resource, null, XML_CONTENT_TYPE, "DELETE", Collections.singletonMap("If-Match", "*"));
 		} finally {
 			removeRegistrationId(registrationName);
 		}
 	}
-		
+
 	/**
 	 * Retrieves the registration id associated to the registration name from local storage
 	 * @param registrationName	The registration name to look for in local storage
@@ -493,7 +493,7 @@ public class NotificationHub {
 	private String retrieveRegistrationId(String registrationName) throws Exception {
 		return mSharedPreferences.getString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, null);
 	}
-	
+
 	/**
 	 * Stores the registration name and id association in local storage
 	 * @param registrationName	The registration name to store in local storage
@@ -506,13 +506,13 @@ public class NotificationHub {
 		editor.putString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, registrationId);
 
 		editor.putString(STORAGE_PREFIX + PNS_HANDLE_KEY, pNSHandle);
-		
+
 		// Always overwrite the storage version with the latest value
 		editor.putString(STORAGE_PREFIX + STORAGE_VERSION_KEY, STORAGE_VERSION);
-		
+
 		editor.commit();
 	}
-	
+
 	/**
 	 * Removes the registration name and id association from local storage
 	 * @param registrationName	The registration name of the association to remove from local storage
@@ -525,7 +525,7 @@ public class NotificationHub {
 
 		editor.commit();
 	}
-	
+
 	private void verifyStorageVersion() {
 		String currentStorageVersion = mSharedPreferences.getString(STORAGE_PREFIX + STORAGE_VERSION_KEY, "");
 
@@ -533,17 +533,17 @@ public class NotificationHub {
 
 		if (!currentStorageVersion.equals(STORAGE_VERSION)) {
 			Set<String> keys = mSharedPreferences.getAll().keySet();
-			
+
 			for (String key : keys) {
 				if (key.startsWith(STORAGE_PREFIX)) {
 					editor.remove(key);
 				}
 			}
 		}
-		
+
 		editor.commit();
-		
+
 		mIsRefreshNeeded = true;
 	}
-	
+
 }

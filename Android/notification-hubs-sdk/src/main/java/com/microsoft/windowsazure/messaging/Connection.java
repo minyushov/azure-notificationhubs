@@ -20,43 +20,40 @@ See the Apache Version 2.0 License for specific language governing permissions a
 
 package com.microsoft.windowsazure.messaging;
 
-import static com.microsoft.windowsazure.messaging.Utils.isNullOrWhiteSpace;
+import android.os.Build;
+import android.util.Base64;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.protocol.HTTP;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.internal.http.HttpMethod;
 
-import android.net.http.AndroidHttpClient;
-import android.os.Build;
-import android.util.Base64;
+import static com.microsoft.windowsazure.messaging.Utils.isNullOrWhiteSpace;
 
 /**
  * The connection with a Notification Hub server
  */
 class Connection {
-
 	/**
 	 * Shared access key name
 	 */
@@ -112,41 +109,110 @@ class Connection {
 	 */
 	private Map<String, String> mConnectionData;
 
+	private final OkHttpClient client;
+
 	/**
 	 * Creates a new connection object
-	 * @param connectionString	The connection string 
+	 *
+	 * @param connectionString
+	 * 		The connection string
 	 */
-	public Connection(String connectionString) {
+	Connection(String connectionString) {
 		mConnectionData = ConnectionStringParser.parse(connectionString);
+
+		OkHttpClient.Builder builder = new OkHttpClient.Builder();
+		builder.connectTimeout(30, TimeUnit.SECONDS);
+		builder.readTimeout(60, TimeUnit.SECONDS);
+		builder.writeTimeout(30, TimeUnit.SECONDS);
+
+		this.client = builder.build();
 	}
 
 	/**
 	 * Executes a request to the Notification Hub server
-	 * @param resource	The resource to access
-	 * @param content	The request content body
-	 * @param contentType	The request content type
-	 * @param method	The request method
-	 * @param extraHeaders	Extra headers to include in the request
-	 * @return	The response content body
+	 *
+	 * @param resource
+	 * 		The resource to access
+	 * @param content
+	 * 		The request content body
+	 * @param contentType
+	 * 		The request content type
+	 * @param method
+	 * 		The request method
+	 *
+	 * @return The response content body
+	 *
 	 * @throws Exception
 	 */
-	public String executeRequest(String resource, String content, String contentType, String method, Header... extraHeaders) throws Exception {
-		return executeRequest(resource, content, contentType, method, null, extraHeaders);
+	String executeRequest(String resource, String content, String contentType, String method) throws Exception {
+		return executeRequest(resource, content, contentType, method, null, null);
 	}
-	
-	
+
 	/**
 	 * Executes a request to the Notification Hub server
-	 * @param resource	The resource to access
-	 * @param content	The request content body
-	 * @param contentType	The request content type
-	 * @param method	The request method
-	 * @param targetHeaderName The header name when we need to get value from it in instead of content
-	 * @param extraHeaders	Extra headers to include in the request
-	 * @return	The response content body
+	 *
+	 * @param resource
+	 * 		The resource to access
+	 * @param content
+	 * 		The request content body
+	 * @param contentType
+	 * 		The request content type
+	 * @param method
+	 * 		The request method
+	 * @param extraHeaders
+	 * 		Extra headers to include in the request
+	 *
+	 * @return The response content body
+	 *
 	 * @throws Exception
 	 */
-	public String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName, Header... extraHeaders) throws Exception {
+	String executeRequest(String resource, String content, String contentType, String method, Map<String, String> extraHeaders) throws Exception {
+		return executeRequest(resource, content, contentType, method, null, extraHeaders);
+	}
+
+	/**
+	 * Executes a request to the Notification Hub server
+	 *
+	 * @param resource
+	 * 		The resource to access
+	 * @param content
+	 * 		The request content body
+	 * @param contentType
+	 * 		The request content type
+	 * @param method
+	 * 		The request method
+	 * @param targetHeaderName
+	 * 		The header name when we need to get value from it in instead of content
+	 *
+	 * @return The response content body
+	 *
+	 * @throws Exception
+	 */
+	String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName) throws Exception {
+		return executeRequest(resource, content, contentType, method, targetHeaderName, null);
+	}
+
+	/**
+	 * Executes a request to the Notification Hub server
+	 *
+	 * @param resource
+	 * 		The resource to access
+	 * @param content
+	 * 		The request content body
+	 * @param contentType
+	 * 		The request content type
+	 * @param method
+	 * 		The request method
+	 * @param targetHeaderName
+	 * 		The header name when we need to get value from it in instead of content
+	 * @param extraHeaders
+	 * 		Extra headers to include in the request
+	 *
+	 * @return The response content body
+	 *
+	 * @throws Exception
+	 */
+	private String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName, Map<String, String> extraHeaders) throws Exception {
 		URI endpointURI = URI.create(mConnectionData.get(ENDPOINT_KEY));
 		String scheme = endpointURI.getScheme();
 
@@ -157,31 +223,36 @@ class Connection {
 		}
 
 		url += resource;
-
 		url = AddApiVersionToUrl(url);
 
-		BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, url);
+		Request.Builder builder = new Request.Builder();
+		builder.url(url);
 
-		if (!Utils.isNullOrWhiteSpace(content)) {
-			request.setEntity(new StringEntity(content, UTF8_ENCODING));
+		if (HttpMethod.requiresRequestBody(method) && content == null) {
+			builder.method(method, RequestBody.create(null, ""));
+		} else {
+			builder.method(method, content != null ? RequestBody.create(MediaType.parse(contentType), content) : null);
 		}
 
-		request.addHeader(HTTP.CONTENT_TYPE, contentType);
-		EntityEnclosingRequestWrapper wrapper = new EntityEnclosingRequestWrapper(request);
-
+		Headers.Builder headers = new Headers.Builder();
 		if (extraHeaders != null) {
-			for (Header header : extraHeaders) {
-				wrapper.addHeader(header);
-			}
+			headers = Headers.of(extraHeaders).newBuilder();
 		}
+		headers.add("User-Agent", getUserAgent());
+		headers.add(AUTHORIZATION_HEADER, generateAuthToken(url));
 
-		return executeRequest(wrapper, targetHeaderName);
+		builder.headers(headers.build());
+
+		return executeRequest(builder.build(), targetHeaderName);
 	}
 
 	/**
 	 * Adds the API Version querystring parameter to a URL
-	 * @param url	The URL to modify
-	 * @return	The modified URL
+	 *
+	 * @param url
+	 * 		The URL to modify
+	 *
+	 * @return The modified URL
 	 */
 	private String AddApiVersionToUrl(String url) {
 		URI uri = URI.create(url);
@@ -199,47 +270,40 @@ class Connection {
 
 	/**
 	 * Executes a web request
-	 * @param request	The request to execute
-	 * @param targetHeaderName The header name when we need to get value from it in instead of content
-	 * @return	The content string or header value
+	 *
+	 * @param request
+	 * 		The request to execute
+	 * @param targetHeaderName
+	 * 		The header name when we need to get value from it in instead of content
+	 *
+	 * @return The content string or header value
+	 *
 	 * @throws Exception
 	 */
-	private String executeRequest(HttpUriRequest request, String targetHeaderName) throws Exception {
-		addAuthorizationHeader(request);
-
+	private String executeRequest(Request request, String targetHeaderName) throws Exception {
 		int status;
 		String content;
-		String headerValue=null;
-		AndroidHttpClient client = null;
-		boolean noHeaderButExpected=false;
+		String headerValue = null;
+		boolean noHeaderButExpected = false;
 
-		try {
-			client = AndroidHttpClient.newInstance(getUserAgent());
+		Response response = client.newCall(request).execute();
+		status = response.code();
+		content = getResponseContent(response);
 
-			HttpResponse response = client.execute(request);
-
-			status = response.getStatusLine().getStatusCode();			
-			content = getResponseContent(response);
-			
-			if(targetHeaderName!=null){
-				if(!response.containsHeader(targetHeaderName)){
-					noHeaderButExpected=true;					
-				} else{
-					headerValue=response.getFirstHeader(targetHeaderName).getValue();
-				}
-			}
-
-		} finally {
-			if (client != null) {
-				client.close();
+		if (targetHeaderName != null) {
+			List<String> targetHeaderValues = response.headers(targetHeaderName);
+			if (targetHeaderValues == null || targetHeaderValues.isEmpty()) {
+				noHeaderButExpected = true;
+			} else {
+				headerValue = targetHeaderValues.get(0);
 			}
 		}
 
 		if (status >= 200 && status < 300) {
-			if(noHeaderButExpected){
-				throw new NotificationHubException("The '"+targetHeaderName + "' header does not present in collection", status);
+			if (noHeaderButExpected) {
+				throw new NotificationHubException("The '" + targetHeaderName + "' header does not present in collection", status);
 			}
-			return targetHeaderName==null?content:headerValue;
+			return targetHeaderName == null ? content : headerValue;
 		} else if (status == 404) {
 			throw new NotificationHubResourceNotFoundException();
 		} else if (status == 401) {
@@ -253,54 +317,39 @@ class Connection {
 
 	/**
 	 * Reads the content from a response to a string
-	 * @param response	The response to read
-	 * @return	The content string
+	 *
+	 * @param response
+	 * 		The response to read
+	 *
+	 * @return The content string
+	 *
 	 * @throws java.io.IOException
 	 */
-	private String getResponseContent(HttpResponse response) throws IOException {
-		HttpEntity entity = response.getEntity();
-		if (entity != null) {
-			InputStream instream = entity.getContent();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
-
-			StringBuilder sb = new StringBuilder();
-			String content = reader.readLine();
-			while (content != null) {
-				sb.append(content);
-				sb.append('\n');
-				content = reader.readLine();
-			}
-
-			return sb.toString();
+	private String getResponseContent(Response response) throws IOException {
+		ResponseBody responseBody = response.body();
+		if (responseBody != null) {
+			return responseBody.string();
 		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * Adds the Authorization header to a request
-	 * @param request	The request to modify
-	 * @throws java.security.InvalidKeyException
-	 */
-	private void addAuthorizationHeader(HttpUriRequest request) throws InvalidKeyException {
-		String token = generateAuthToken(request.getURI().toString());
-
-		request.addHeader(AUTHORIZATION_HEADER, token);
-	}
-
-	/**
 	 * Generates an AuthToken
-	 * @param url	The target URL
-	 * @return	An AuthToken
+	 *
+	 * @param url
+	 * 		The target URL
+	 *
+	 * @return An AuthToken
+	 *
 	 * @throws java.security.InvalidKeyException
 	 */
 	private String generateAuthToken(String url) throws InvalidKeyException {
-		
 		String keyName = mConnectionData.get(SHARED_ACCESS_KEY_NAME);
 		if (isNullOrWhiteSpace(keyName)) {
 			throw new AssertionError("SharedAccessKeyName");
 		}
-		
+
 		String key = mConnectionData.get(SHARED_ACCESS_KEY);
 		if (isNullOrWhiteSpace(key)) {
 			throw new AssertionError("SharedAccessKey");
@@ -342,18 +391,14 @@ class Connection {
 		}
 
 		// construct authorization string
-		String token = "SharedAccessSignature sr=" + url + "&sig=" + base64Signature + "&se=" + expires + "&skn=" + keyName;
-
-		return token;
+		return "SharedAccessSignature sr=" + url + "&sig=" + base64Signature + "&se=" + expires + "&skn=" + keyName;
 	}
 
 	/**
 	 * Generates the User-Agent
 	 */
 	private String getUserAgent() {
-		String userAgent = String.format("NOTIFICATIONHUBS/%s (api-origin=%s; os=%s; os_version=%s;)", 
+		return String.format("NOTIFICATIONHUBS/%s (api-origin=%s; os=%s; os_version=%s;)",
 				SDK_VERSION, PnsSpecificRegistrationFactory.getInstance().getAPIOrigin(), "Android", Build.VERSION.RELEASE);
-
-		return userAgent;
 	}
 }

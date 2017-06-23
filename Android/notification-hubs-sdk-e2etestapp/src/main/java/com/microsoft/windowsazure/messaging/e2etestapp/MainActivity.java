@@ -19,13 +19,6 @@ See the Apache Version 2.0 License for specific language governing permissions a
  */
 package com.microsoft.windowsazure.messaging.e2etestapp;
 
-import java.net.URI;
-import java.util.List;
-
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -45,11 +38,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.microsoft.windowsazure.messaging.e2etestapp.framework.TestCase;
 import com.microsoft.windowsazure.messaging.e2etestapp.framework.TestExecutionCallback;
 import com.microsoft.windowsazure.messaging.e2etestapp.framework.TestGroup;
 import com.microsoft.windowsazure.messaging.e2etestapp.framework.TestResult;
 import com.microsoft.windowsazure.messaging.e2etestapp.tests.MiscTests;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
@@ -57,22 +58,22 @@ public class MainActivity extends Activity {
 	private StringBuilder mLog;
 
 	private ListView mTestCaseList;
-	
+
 	private Spinner mTestGroupSpinner;
 
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		// don't restart the activity. Just process the configuration change
 		super.onConfigurationChanged(newConfig);
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		ApplicationContext.setContext(this);
-		
+
 		setContentView(R.layout.activity_main);
 
 		mTestCaseList = (ListView) findViewById(R.id.testCaseList);
@@ -95,7 +96,7 @@ public class MainActivity extends Activity {
 				// do nothing
 			}
 		});
-		
+
 		refreshTestGroupsAndLog();
 	}
 
@@ -133,7 +134,7 @@ public class MainActivity extends Activity {
 
 		case R.id.menu_run_tests:
 			if (
-				ApplicationContext.getNotificationHubEndpoint().trim().equals("") || 
+				ApplicationContext.getNotificationHubEndpoint().trim().equals("") ||
 				ApplicationContext.getNotificationHubKeyName().trim().equals("") ||
 				ApplicationContext.getNotificationHubKeyValue().trim().equals("") ||
 				ApplicationContext.getNotificationHubName().trim().equals("")) {
@@ -160,11 +161,11 @@ public class MainActivity extends Activity {
 			logDialogBuilder.setTitle("Log");
 
 			final WebView webView = new WebView(this);
-			
+
 			String logContent = TextUtils.htmlEncode(mLog.toString()).replace("\n", "<br />");
 			String logHtml = "<html><body><pre>" + logContent + "</pre></body></html>";
 			webView.loadData(logHtml, "text/html", "utf-8");
-			
+
 			logDialogBuilder.setPositiveButton("Copy", new DialogInterface.OnClickListener() {
 
 				@Override
@@ -173,11 +174,11 @@ public class MainActivity extends Activity {
 					clipboardManager.setText(mLog.toString());
 				}
 			});
-			
+
 			final String postContent = mLog.toString();
-			
+
 			logDialogBuilder.setNeutralButton("Post data", new DialogInterface.OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					new AsyncTask<Void, Void, Void>() {
@@ -186,21 +187,27 @@ public class MainActivity extends Activity {
 						protected Void doInBackground(Void... params) {
 							try {
 								String url = ApplicationContext.getLogPostURL();
-								if (url != null && url.trim() != "") {
+								if (!Objects.equals(url.trim(), "")) {
 									url = url + "?platform=android";
-									HttpPost post = new HttpPost();
-									post.setEntity(new StringEntity(postContent, "utf-8"));
-									
-									post.setURI(new URI(url));
-									
-									new DefaultHttpClient().execute(post);
+
+									Request request = new Request
+											.Builder()
+											.url(url)
+											.method("POST", RequestBody.create(MediaType.parse("text/plain"), postContent))
+											.build();
+
+									new OkHttpClient
+											.Builder()
+											.build()
+											.newCall(request)
+											.execute();
 								}
 							} catch (Exception e) {
 								// Wasn't able to post the data. Do nothing
 							}
-							
+
 							return null;
-						}	
+						}
 					}.execute();
 				}
 			});
@@ -270,15 +277,15 @@ public class MainActivity extends Activity {
 				}
 
 				final TestCaseAdapter adapter = (TestCaseAdapter) mTestCaseList.getAdapter();
-				
+
 				runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
 						adapter.notifyDataSetChanged();
-						
+
 					}
-					
+
 				});
 				log("TEST LOG", test.getLog());
 				log("TEST COMPLETED", test.getName() + " - " + result.getStatus().toString() + " - Ex: " + exMessage);
@@ -293,7 +300,7 @@ public class MainActivity extends Activity {
 		mLog.append("----\n");
 		mLog.append("\n");
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void log(String content) {
 		log("Info", content);
@@ -301,16 +308,16 @@ public class MainActivity extends Activity {
 
 	private void log(String title, String content) {
 		String message = title + " - " + content;
-		Log.d("NOTIFICATIONHUBS-E2ETESTAPP", message);
+		Log.d("NOTIFICATIONHUBS", message);
 
 		mLog.append(message);
 		mLog.append('\n');
 	}
 
-	
+
 	/**
 	 * Creates a dialog and shows it
-	 * 
+	 *
 	 * @param exception
 	 *            The exception to show in the dialog
 	 * @param title
@@ -323,7 +330,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Creates a dialog and shows it
-	 * 
+	 *
 	 * @param message
 	 *            The dialog message
 	 * @param title
