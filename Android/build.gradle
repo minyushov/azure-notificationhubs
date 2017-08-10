@@ -3,7 +3,7 @@ buildscript {
 		androidMinSdkVersion = 19
 		androidCompileSdkVersion = 25
 		androidTargetSdkVersion = 25
-		androidBuildToolsVersion = "26.0.0"
+		androidBuildToolsVersion = "26.0.1"
 		androidSupportLibraryVersion = "25.4.0"
 	}
 	repositories {
