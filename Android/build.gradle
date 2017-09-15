@@ -1,11 +1,6 @@
+apply from: "versions.gradle"
+
 buildscript {
-	ext {
-		androidMinSdkVersion = 19
-		androidCompileSdkVersion = 25
-		androidTargetSdkVersion = 25
-		androidBuildToolsVersion = "26.0.1"
-		androidSupportLibraryVersion = "25.4.0"
-	}
 	repositories {
 		jcenter()
 	}
