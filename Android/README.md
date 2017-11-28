@@ -5,16 +5,16 @@ With Windows Azure Notification Hubs you can easily send push notifications to y
 ## Getting Started with Android SDK
 Please follow our [tutorial](http://msdn.microsoft.com/en-us/library/dn265921.aspx) to start using the Android SDK with Windows Azure Notification Hubs.
 
-## Download the source code
-To get the source code of our SDKs and samples via **git** just type:
+## Integration
+```groovy
+repositories {
+    maven { url "http://dl.bintray.com/minyushov/azure" }
+}
 
-    git clone https://github.com/WindowsAzure/azure-notificationhubs.git
-    cd ./azure-notificationhubs/
-
-## Building and Referencing the SDK
-
-1. Import the `\azure-notificationhubs\notification-hubs-sdk` project into your workspace
-2. Once Eclipse is done compiling, the resulting .jar file will be located in `\azure-notificationhubs\notification-hubs-sdk\bin`.
+dependencies {
+    compile "com.minyushov.azure:azure-notification-hubs:0.4.4"
+}
+```
 
 ## Need Help?
 
