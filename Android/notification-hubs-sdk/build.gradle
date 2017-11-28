@@ -27,9 +27,9 @@ dependencies {
 }
 
 bintrayUpload {
-	dryRun = true
-	repo = "android"
-	groupId = "com.minyushov.android"
+	dryRun = false
+	repo = "azure"
+	groupId = "com.minyushov.azure"
 	artifactId = "azure-notification-hubs"
 	version = "0.4.4"
 	vcsUrl = "https://github.com/minyushov/azure-notificationhubs.git"
