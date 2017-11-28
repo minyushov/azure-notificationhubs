@@ -3,9 +3,13 @@ apply from: "versions.gradle"
 buildscript {
 	repositories {
 		jcenter()
+		google()
+		maven { url 'https://dl.bintray.com/minyushov/gradle' }
 	}
+
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.3.3'
+		classpath 'com.android.tools.build:gradle:3.0.1'
+		classpath 'com.minyushov.gradle:bintray:1.0.0'
 	}
 }
 

@@ -1,9 +1,9 @@
 ext {
 	androidMinSdkVersion = 19
-	androidCompileSdkVersion = 26
-	androidTargetSdkVersion = 25
-	androidBuildToolsVersion = "26.0.1"
-	androidSupportLibraryVersion = "26.0.2"
+	androidCompileSdkVersion = 27
+	androidTargetSdkVersion = 27
+	androidBuildToolsVersion = "27.0.1"
+	androidSupportLibraryVersion = "27.0.1"
 
 	okhttpVersion = "3.9.0"
 }
