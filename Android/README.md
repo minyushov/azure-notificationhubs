@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.minyushov.azure:azure-notification-hubs:0.4.4"
+    compile "com.minyushov.azure:azure-notification-hubs:0.4.5"
 }
 ```
 
