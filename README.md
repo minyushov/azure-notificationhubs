@@ -6,12 +6,17 @@ Azure Notification Hubs provide an easy-to-use, multiplatform, scaled-out push i
 
 If you are new to Notification Hubs, you can get started by following our tutorials to push notifications to your [iOS apps](https://azure.microsoft.com/en-us/documentation/articles/notification-hubs-ios-get-started/), [Android apps](https://azure.microsoft.com/en-us/documentation/articles/notification-hubs-android-get-started/), and [Windows Universal apps](https://azure.microsoft.com/en-us/documentation/articles/notification-hubs-windows-store-dotnet-get-started/).
 
-## Download Source Code
+## Integration
 
-To get the source code of our SDKs via **git** just type:
+```groovy
+repositories {
+    maven { url "https://dl.bintray.com/minyushov/azure" }
+}
 
-    git clone https://github.com/Azure/azure-notificationhubs.git
-    cd ./azure-notificationhubs/
+dependencies {
+    compile "com.minyushov.azure:azure-notification-hubs:0.4.5"
+}
+```
 
 ## Useful Resources
 
