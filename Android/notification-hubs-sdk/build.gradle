@@ -29,7 +29,7 @@ bintrayUpload {
 	repo = "azure"
 	groupId = "com.minyushov.azure"
 	artifactId = "azure-notification-hubs"
-	version = "0.4.5"
+	version = "0.4.6"
 	vcsUrl = "https://github.com/minyushov/azure-notificationhubs.git"
 	license = "Apache-2.0"
 	docsSettings {
