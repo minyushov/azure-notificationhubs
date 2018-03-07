@@ -32,4 +32,12 @@ bintrayUpload {
 	version = "0.4.4"
 	vcsUrl = "https://github.com/minyushov/azure-notificationhubs.git"
 	license = "Apache-2.0"
+	docsSettings {
+		options {
+			docTitle "Azure Notification Hubs SDK ${bintrayUpload.version}"
+			windowTitle docTitle
+			links "https://docs.oracle.com/javase/8/docs/api/"
+			links "https://developer.android.com/reference/"
+		}
+	}
 }
