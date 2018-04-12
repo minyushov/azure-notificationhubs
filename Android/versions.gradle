@@ -3,7 +3,7 @@ ext {
 	androidCompileSdkVersion = 27
 	androidTargetSdkVersion = 27
 	androidBuildToolsVersion = "27.0.3"
-	androidSupportLibraryVersion = "27.1.0"
+	androidSupportLibraryVersion = "27.1.1"
 
 	okhttpVersion = "3.10.0"
 }
