@@ -28,3 +28,4 @@ iOS/BVT/IosSdkTests/Default@2x.png
 *.iml
 .idea
 local.properties
+.gradle
