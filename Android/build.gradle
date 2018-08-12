@@ -1,21 +1,26 @@
-apply from: "versions.gradle"
-
 buildscript {
-	repositories {
-		jcenter()
-		google()
-		maven { url 'https://dl.bintray.com/minyushov/gradle' }
-	}
+  ext {
+    androidMinSdkVersion = 19
+    androidCompileSdkVersion = 28
+    androidTargetSdkVersion = 28
+    okhttpVersion = "3.11.0"
+  }
 
-	dependencies {
-		classpath 'com.android.tools.build:gradle:3.1.1'
-		classpath 'com.minyushov.gradle:bintray:1.0.4'
-	}
+  repositories {
+    jcenter()
+    google()
+    maven { url 'https://dl.bintray.com/minyushov/gradle' }
+  }
+
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.2.0-beta05'
+    classpath 'com.minyushov.gradle:bintray:1.1.0'
+  }
 }
 
 allprojects {
-	repositories {
-		jcenter()
-		google()
-	}
+  repositories {
+    jcenter()
+    google()
+  }
 }
