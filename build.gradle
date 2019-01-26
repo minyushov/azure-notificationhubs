@@ -3,7 +3,7 @@ buildscript {
     androidMinSdkVersion = 19
     androidCompileSdkVersion = 28
     androidTargetSdkVersion = 28
-    okhttpVersion = "3.11.0"
+    okhttpVersion = "3.12.1"
   }
 
   repositories {
@@ -13,8 +13,8 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.2.1'
-    classpath 'com.minyushov.gradle:bintray:1.1.0'
+    classpath 'com.android.tools.build:gradle:3.4.0-beta02'
+    classpath 'com.minyushov.gradle:bintray:1.2.0'
   }
 }
 
