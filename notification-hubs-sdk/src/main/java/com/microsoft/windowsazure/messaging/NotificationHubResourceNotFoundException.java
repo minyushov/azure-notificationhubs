@@ -25,13 +25,13 @@ package com.microsoft.windowsazure.messaging;
  */
 public class NotificationHubResourceNotFoundException extends NotificationHubException {
 
-	private static final long serialVersionUID = -1205615098165583127L;
+  private static final long serialVersionUID = -1205615098165583127L;
 
-	/**
-	 * Creates a new NotificationHubResourceNotFoundException
-	 */
-	NotificationHubResourceNotFoundException() {
-		super("Resource not found", 404);
-	}
+  /**
+   * Creates a new NotificationHubResourceNotFoundException
+   */
+  NotificationHubResourceNotFoundException() {
+    super("Resource not found", 404);
+  }
 
 }

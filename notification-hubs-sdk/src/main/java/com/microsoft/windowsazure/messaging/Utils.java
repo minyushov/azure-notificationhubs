@@ -21,6 +21,7 @@ See the Apache Version 2.0 License for specific language governing permissions a
 package com.microsoft.windowsazure.messaging;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -31,19 +32,19 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 
 class Utils {
-	public static boolean isNullOrWhiteSpace(String str) {
-		return str == null || str.trim().equals("");
-	}
+  static boolean isNullOrWhiteSpace(String str) {
+    return str == null || str.trim().equals("");
+  }
 
-	public static String getXmlString(Element element) throws Exception {
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		StreamResult result = new StreamResult(buffer);
+  static String getXmlString(Element element) throws Exception {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    StreamResult result = new StreamResult(buffer);
 
-		DOMSource source = new DOMSource(element);
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		transformer.transform(source, result);
+    DOMSource source = new DOMSource(element);
+    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    transformer.transform(source, result);
 
-		return new String(buffer.toByteArray(), "UTF-8");
-	}
+    return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+  }
 }

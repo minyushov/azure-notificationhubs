@@ -25,16 +25,16 @@ package com.microsoft.windowsazure.messaging;
  */
 public class NotificationHubUnauthorizedException extends NotificationHubException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5926583893712403416L;
+  /**
+   *
+   */
+  private static final long serialVersionUID = -5926583893712403416L;
 
-	/**
-	 * Creates a new NotificationHubResourceNotFoundException
-	 */
-	NotificationHubUnauthorizedException() {
-		super("Unauthorized", 401);
-	}
+  /**
+   * Creates a new NotificationHubResourceNotFoundException
+   */
+  NotificationHubUnauthorizedException() {
+    super("Unauthorized", 401);
+  }
 
 }

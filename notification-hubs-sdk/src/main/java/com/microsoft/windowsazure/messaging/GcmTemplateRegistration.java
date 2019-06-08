@@ -28,38 +28,39 @@ import org.w3c.dom.Element;
  */
 public class GcmTemplateRegistration extends TemplateRegistration {
 
-	/**
-	 * Custom payload node name for template registrations
-	 */
-	static final String GCM_TEMPLATE_REGISTRATION_CUSTOM_NODE = "GcmTemplateRegistrationDescription";
-	
-	/**
-	 * Custom node name for PNS handle
-	 */
-	private static final String GCM_HANDLE_NODE = "GcmRegistrationId";
+  /**
+   * Custom payload node name for template registrations
+   */
+  static final String GCM_TEMPLATE_REGISTRATION_CUSTOM_NODE = "GcmTemplateRegistrationDescription";
 
-	/**
-	 * Creates a new template registration
-	 * @param notificationHubPath	The notification hub path
-	 */
-	GcmTemplateRegistration(String notificationHubPath) {
-		super(notificationHubPath);
-	}
-	
-	@Override
-	protected String getSpecificPayloadNodeName() {
-		return GCM_TEMPLATE_REGISTRATION_CUSTOM_NODE;
-	}
+  /**
+   * Custom node name for PNS handle
+   */
+  private static final String GCM_HANDLE_NODE = "GcmRegistrationId";
 
-	@Override
-	protected void appendCustomPayload(Document doc, Element templateRegistrationDescription) {
-		appendNodeWithValue(doc, templateRegistrationDescription, GCM_HANDLE_NODE, getPNSHandle());
-		super.appendCustomPayload(doc,templateRegistrationDescription);
-	}
+  /**
+   * Creates a new template registration
+   *
+   * @param notificationHubPath The notification hub path
+   */
+  GcmTemplateRegistration(String notificationHubPath) {
+    super(notificationHubPath);
+  }
 
-	@Override
-	protected void loadCustomXmlData(Element payloadNode) {
-		setPNSHandle(getNodeValue(payloadNode, GCM_HANDLE_NODE));
-		super.loadCustomXmlData(payloadNode);
-	}	
+  @Override
+  protected String getSpecificPayloadNodeName() {
+    return GCM_TEMPLATE_REGISTRATION_CUSTOM_NODE;
+  }
+
+  @Override
+  protected void appendCustomPayload(Document doc, Element templateRegistrationDescription) {
+    appendNodeWithValue(doc, templateRegistrationDescription, GCM_HANDLE_NODE, getPNSHandle());
+    super.appendCustomPayload(doc, templateRegistrationDescription);
+  }
+
+  @Override
+  protected void loadCustomXmlData(Element payloadNode) {
+    setPNSHandle(getNodeValue(payloadNode, GCM_HANDLE_NODE));
+    super.loadCustomXmlData(payloadNode);
+  }
 }

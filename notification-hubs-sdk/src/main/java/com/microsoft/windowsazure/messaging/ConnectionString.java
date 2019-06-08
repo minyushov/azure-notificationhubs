@@ -28,54 +28,57 @@ import static com.microsoft.windowsazure.messaging.Utils.*;
  * Connection string utilities to connect with a Notification Hub
  */
 public class ConnectionString {
-	/**
-	 * Creates a connection string using a Shared Access Secret
-	 * @param endPoint	The endpoint
-	 * @param keyName	The key name
-	 * @param accessSecret	The Shared Access Secret
-	 * @return	The connection string
-	 */
-	public static String createUsingSharedAccessKey(URI endPoint, String keyName, String accessSecret) {
-		if (endPoint == null) {
-			throw new IllegalArgumentException("endPoint");
-		}
+  /**
+   * Creates a connection string using a Shared Access Secret
+   *
+   * @param endPoint     The endpoint
+   * @param keyName      The key name
+   * @param accessSecret The Shared Access Secret
+   * @return The connection string
+   */
+  public static String createUsingSharedAccessKey(URI endPoint, String keyName, String accessSecret) {
+    if (endPoint == null) {
+      throw new IllegalArgumentException("endPoint");
+    }
 
-		if (isNullOrWhiteSpace(keyName)) {
-			throw new IllegalArgumentException("keyName");
-		}
+    if (isNullOrWhiteSpace(keyName)) {
+      throw new IllegalArgumentException("keyName");
+    }
 
-		if (isNullOrWhiteSpace(accessSecret)) {
-			throw new IllegalArgumentException("accessSecret");
-		}
+    if (isNullOrWhiteSpace(accessSecret)) {
+      throw new IllegalArgumentException("accessSecret");
+    }
 
-		return String.format("Endpoint=%s;SharedAccessKeyName=%s;SharedAccessKey=%s", endPoint.toString(), keyName, accessSecret);
-	}
+    return String.format("Endpoint=%s;SharedAccessKeyName=%s;SharedAccessKey=%s", endPoint.toString(), keyName, accessSecret);
+  }
 
-	/**
-	 * Creates a connection string using a Shared Access Secret with full access
-	 * @param endPoint	The endpoint
-	 * @param fullAccessSecret	The Shared Access Secret
-	 * @return	The connection string
-	 */
-	public static String createUsingSharedAccessKeyWithFullAccess(URI endPoint, String fullAccessSecret) {
-		if (isNullOrWhiteSpace(fullAccessSecret)) {
-			throw new IllegalArgumentException("fullAccessSecret");
-		}
+  /**
+   * Creates a connection string using a Shared Access Secret with full access
+   *
+   * @param endPoint         The endpoint
+   * @param fullAccessSecret The Shared Access Secret
+   * @return The connection string
+   */
+  public static String createUsingSharedAccessKeyWithFullAccess(URI endPoint, String fullAccessSecret) {
+    if (isNullOrWhiteSpace(fullAccessSecret)) {
+      throw new IllegalArgumentException("fullAccessSecret");
+    }
 
-		return createUsingSharedAccessKey(endPoint, "DefaultFullSharedAccessSignature", fullAccessSecret);
-	}
+    return createUsingSharedAccessKey(endPoint, "DefaultFullSharedAccessSignature", fullAccessSecret);
+  }
 
-	/**
-	 * Creates a connection string using a Shared Access Secret with listen access
-	 * @param endPoint	The endpoint
-	 * @param listenAccessSecret	the Shared Access Secret
-	 * @return The connection string
-	 */
-	public static String createUsingSharedAccessKeyWithListenAccess(URI endPoint, String listenAccessSecret) {
-		if (isNullOrWhiteSpace(listenAccessSecret)) {
-			throw new IllegalArgumentException("listenAccessSecret");
-		}
+  /**
+   * Creates a connection string using a Shared Access Secret with listen access
+   *
+   * @param endPoint           The endpoint
+   * @param listenAccessSecret the Shared Access Secret
+   * @return The connection string
+   */
+  public static String createUsingSharedAccessKeyWithListenAccess(URI endPoint, String listenAccessSecret) {
+    if (isNullOrWhiteSpace(listenAccessSecret)) {
+      throw new IllegalArgumentException("listenAccessSecret");
+    }
 
-		return createUsingSharedAccessKey(endPoint, "DefaultListenSharedAccessSignature", listenAccessSecret);
-	}
+    return createUsingSharedAccessKey(endPoint, "DefaultListenSharedAccessSignature", listenAccessSecret);
+  }
 }

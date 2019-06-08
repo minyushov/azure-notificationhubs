@@ -31,77 +31,77 @@ import org.w3c.dom.NodeList;
  */
 public abstract class TemplateRegistration extends Registration {
 
-	/**
-	 * The template body
-	 */
-	private String mBodyTemplate;
+  /**
+   * The template body
+   */
+  private String mBodyTemplate;
 
-	/**
-	 * Creates a new template registration
-	 * 
-	 * @param notificationHubPath	The notification hub path
-	 */
-	TemplateRegistration(String notificationHubPath) {
-		super(notificationHubPath);
-	}
+  /**
+   * Creates a new template registration
+   *
+   * @param notificationHubPath The notification hub path
+   */
+  TemplateRegistration(String notificationHubPath) {
+    super(notificationHubPath);
+  }
 
-	@Override
-	protected void appendCustomPayload(Document doc, Element templateRegistrationDescription) {
-		appendBodyTemplateNode(doc, templateRegistrationDescription);
-		appendNodeWithValue(doc, templateRegistrationDescription, "TemplateName", getName());
-	}
+  @Override
+  protected void appendCustomPayload(Document doc, Element templateRegistrationDescription) {
+    appendBodyTemplateNode(doc, templateRegistrationDescription);
+    appendNodeWithValue(doc, templateRegistrationDescription, "TemplateName", getName());
+  }
 
-	/**
-	 * Appends the template body to a registration xml
-	 * 
-	 * @param doc
-	 * @param templateRegistrationDescription
-	 */
-	private void appendBodyTemplateNode(Document doc, Element templateRegistrationDescription) {
-		if (!Utils.isNullOrWhiteSpace(getBodyTemplate())) {
-			Element bodyTemplate = doc.createElement("BodyTemplate");
-			templateRegistrationDescription.appendChild(bodyTemplate);
+  /**
+   * Appends the template body to a registration xml
+   *
+   * @param doc
+   * @param templateRegistrationDescription
+   */
+  private void appendBodyTemplateNode(Document doc, Element templateRegistrationDescription) {
+    if (!Utils.isNullOrWhiteSpace(getBodyTemplate())) {
+      Element bodyTemplate = doc.createElement("BodyTemplate");
+      templateRegistrationDescription.appendChild(bodyTemplate);
 
-			CDATASection bodyTemplateCDATA = doc.createCDATASection(getBodyTemplate());
-			bodyTemplate.appendChild(bodyTemplateCDATA);
-		}
-	}
+      CDATASection bodyTemplateCDATA = doc.createCDATASection(getBodyTemplate());
+      bodyTemplate.appendChild(bodyTemplateCDATA);
+    }
+  }
 
-	@Override
-	protected void loadCustomXmlData(Element payloadNode) {
-		NodeList bodyTemplateElements = payloadNode.getElementsByTagName("BodyTemplate");
-		if (bodyTemplateElements.getLength() > 0) {
-			NodeList bodyNodes = bodyTemplateElements.item(0).getChildNodes();
-			for (int i = 0; i < bodyNodes.getLength(); i++) {
-				if (bodyNodes.item(i) instanceof CharacterData) {
-					CharacterData data = (CharacterData) bodyNodes.item(i);
-					mBodyTemplate = data.getData();
-					break;
-				}
-			}
-		}
+  @Override
+  protected void loadCustomXmlData(Element payloadNode) {
+    NodeList bodyTemplateElements = payloadNode.getElementsByTagName("BodyTemplate");
+    if (bodyTemplateElements.getLength() > 0) {
+      NodeList bodyNodes = bodyTemplateElements.item(0).getChildNodes();
+      for (int i = 0; i < bodyNodes.getLength(); i++) {
+        if (bodyNodes.item(i) instanceof CharacterData) {
+          CharacterData data = (CharacterData) bodyNodes.item(i);
+          mBodyTemplate = data.getData();
+          break;
+        }
+      }
+    }
 
-		setName(getNodeValue(payloadNode, "TemplateName"));
-	}
+    setName(getNodeValue(payloadNode, "TemplateName"));
+  }
 
-	/**
-	 * Gets the template body
-	 */
-	public String getBodyTemplate() {
-		return mBodyTemplate;
-	}
+  /**
+   * Gets the template body
+   */
+  public String getBodyTemplate() {
+    return mBodyTemplate;
+  }
 
-	/**
-	 * Sets the template body
-	 */
-	void setBodyTemplate(String bodyTemplate) {
-		mBodyTemplate = bodyTemplate;
-	}
+  /**
+   * Sets the template body
+   */
+  void setBodyTemplate(String bodyTemplate) {
+    mBodyTemplate = bodyTemplate;
+  }
 
-	/**
-	 * Gets the template name
-	 */
-	public String getTemplateName() {
-		return getName();
-	}
+  /**
+   * Gets the template name
+   */
+  public String getTemplateName() {
+    return getName();
+  }
 }

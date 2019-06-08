@@ -24,25 +24,26 @@ package com.microsoft.windowsazure.messaging;
  * Represents an exception communication with the notification
  */
 public class NotificationHubException extends Exception {
-	private static final long serialVersionUID = -2417498840698257022L;
+  private static final long serialVersionUID = -2417498840698257022L;
 
-	private int mStatusCode;
-	
-	/**
-	 * Creates a NotificationHubException
-	 * @param error	The error message
-	 * @param statusCode	The status code that the server return
-	 */
-	NotificationHubException(String error, int statusCode) {
-		super(error);
-		mStatusCode = statusCode;
-	}
+  private int mStatusCode;
 
-	/**
-	 * Gets the status code that the server returned
-	 */
-	public int getStatusCode() {
-		return mStatusCode;
-	}
+  /**
+   * Creates a NotificationHubException
+   *
+   * @param error      The error message
+   * @param statusCode The status code that the server return
+   */
+  NotificationHubException(String error, int statusCode) {
+    super(error);
+    mStatusCode = statusCode;
+  }
+
+  /**
+   * Gets the status code that the server returned
+   */
+  public int getStatusCode() {
+    return mStatusCode;
+  }
 
 }

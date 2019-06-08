@@ -24,13 +24,13 @@ package com.microsoft.windowsazure.messaging;
  * Represents an exception when registration is gone
  */
 public class RegistrationGoneException extends Exception {
-	
-	private static final long serialVersionUID = -156200383034074631L;
 
-	/**
-	 * Creates a RegistrationGoneException
-	 */
-	RegistrationGoneException() {
-		super("Registration is gone");
-	}
+  private static final long serialVersionUID = -156200383034074631L;
+
+  /**
+   * Creates a RegistrationGoneException
+   */
+  RegistrationGoneException() {
+    super("Registration is gone");
+  }
 }
