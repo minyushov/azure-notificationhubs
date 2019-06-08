@@ -29,7 +29,7 @@ bintrayUpload {
   license = "Apache-2.0"
   docsSettings {
     options {
-      docTitle "Azure Notification Hubs SDK ${bintrayUpload.version}"
+      docTitle "Azure Notification Hubs SDK ${bintrayUpload.version.get()}"
       windowTitle docTitle
       links "https://developer.android.com/reference/"
     }
