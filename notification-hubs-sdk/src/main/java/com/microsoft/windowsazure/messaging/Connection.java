@@ -399,6 +399,6 @@ class Connection {
 	 */
 	private String getUserAgent() {
 		return String.format("NOTIFICATIONHUBS/%s (api-origin=%s; os=%s; os_version=%s;)",
-				SDK_VERSION, PnsSpecificRegistrationFactory.getInstance().getAPIOrigin(), "Android", Build.VERSION.RELEASE);
+				SDK_VERSION, "AndroidSdkGcm", "Android", Build.VERSION.RELEASE);
 	}
 }

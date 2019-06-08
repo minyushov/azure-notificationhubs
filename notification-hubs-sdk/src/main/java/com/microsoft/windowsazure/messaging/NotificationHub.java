@@ -39,8 +39,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.microsoft.windowsazure.messaging.Registration.RegistrationType;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -136,34 +134,12 @@ public class NotificationHub {
 			throw new IllegalArgumentException("pnsHandle");
 		}
 
-		Registration registration = PnsSpecificRegistrationFactory.getInstance().createNativeRegistration(mNotificationHubPath);
+		Registration registration = new GcmNativeRegistration(mNotificationHubPath);
 		registration.setPNSHandle(pnsHandle);
 		registration.setName(Registration.DEFAULT_REGISTRATION_NAME);
 		registration.addTags(tags);
 
 		return registerInternal(registration);
-	}
-
-	/**
-	 * Registers the client for native notifications with the specified tags
-	 * @param userId Baidu user Id
-	 * @param channelId Baidu channel Id
-	 * @param tags	Tags to use in the registration
-	 * @return The created registration
-	 * @throws Exception
-	 */
-	public Registration registerBaidu(String userId, String channelId, String... tags) throws Exception {
-		if (isNullOrWhiteSpace(userId)) {
-			throw new IllegalArgumentException("userId");
-		}
-		if (isNullOrWhiteSpace(channelId)) {
-			throw new IllegalArgumentException("channelId");
-		}
-
-		// Changing the registration type to Baidu.
-		PnsSpecificRegistrationFactory.getInstance().setRegistrationType(RegistrationType.baidu);
-
-		return this.register(userId + "-" + channelId , tags);
 	}
 
 	/**
@@ -188,46 +164,13 @@ public class NotificationHub {
 			throw new IllegalArgumentException("template");
 		}
 
-		TemplateRegistration registration = PnsSpecificRegistrationFactory.getInstance().createTemplateRegistration(mNotificationHubPath);
+		TemplateRegistration registration = new GcmTemplateRegistration(mNotificationHubPath);
 		registration.setPNSHandle(pnsHandle);
 		registration.setName(templateName);
 		registration.setBodyTemplate(template);
 		registration.addTags(tags);
 
 		return (TemplateRegistration) registerInternal(registration);
-	}
-
-	/**
-	 * Registers the client for template notifications with the specified tags
-	 * @param userId The User Id
-	 * @param channelId The channel Id
-	 * @param templateName	The template name
-	 * @param template	The template body
-	 * @param tags	The tags to use in the registration
-	 * @return	The created registration
-	 * @throws Exception
-	 */
-	public TemplateRegistration registerBaiduTemplate(String userId, String channelId, String templateName, String template, String... tags) throws Exception {
-		if (isNullOrWhiteSpace(userId)) {
-			throw new IllegalArgumentException("userId");
-		}
-
-		if (isNullOrWhiteSpace(channelId)) {
-			throw new IllegalArgumentException("channelId");
-		}
-
-		if (isNullOrWhiteSpace(templateName)) {
-			throw new IllegalArgumentException("templateName");
-		}
-
-		if (isNullOrWhiteSpace(template)) {
-			throw new IllegalArgumentException("template");
-		}
-
-		// Changing the registration type to Baidu.
-		PnsSpecificRegistrationFactory.getInstance().setRegistrationType(RegistrationType.baidu);
-
-		return this.registerTemplate(userId + "-" + channelId, templateName, template, tags);
 	}
 
 	/**
@@ -290,7 +233,7 @@ public class NotificationHub {
 		// get existing registrations
 		Connection conn = new Connection(mConnectionString);
 
-		String filter = PnsSpecificRegistrationFactory.getInstance().getPNSHandleFieldName() + " eq '" + pnsHandle + "'";
+		String filter = GcmNativeRegistration.GCM_HANDLE_NODE + " eq '" + pnsHandle + "'";
 
 		String resource = mNotificationHubPath + "/Registrations/?$filter=" + URLEncoder.encode(filter, "UTF-8");
 		String content = null;
@@ -315,10 +258,10 @@ public class NotificationHub {
 			Registration registration;
 			Element entry = (Element) entries.item(i);
 			String xml = getXmlString(entry);
-			if (PnsSpecificRegistrationFactory.getInstance().isTemplateRegistration(xml)) {
-				registration = PnsSpecificRegistrationFactory.getInstance().createTemplateRegistration(mNotificationHubPath);
+			if (isTemplateRegistration(xml)) {
+				registration = new GcmTemplateRegistration(mNotificationHubPath);
 			} else {
-				registration = PnsSpecificRegistrationFactory.getInstance().createNativeRegistration(mNotificationHubPath);
+				registration = new GcmNativeRegistration(mNotificationHubPath);
 			}
 
 			registration.loadXml(xml, mNotificationHubPath);
@@ -438,15 +381,13 @@ public class NotificationHub {
 		String response = conn.executeRequest(resource, content, XML_CONTENT_TYPE, "PUT");
 
 		Registration result;
-		boolean isTemplateRegistration = PnsSpecificRegistrationFactory.getInstance().isTemplateRegistration(response);
-
-		if (isTemplateRegistration)
+		if (isTemplateRegistration(response))
 		{
-			result = PnsSpecificRegistrationFactory.getInstance().createTemplateRegistration(mNotificationHubPath);
+			result = new GcmTemplateRegistration(mNotificationHubPath);
 		}
 		else
 		{
-			result = PnsSpecificRegistrationFactory.getInstance().createNativeRegistration(mNotificationHubPath);
+			result = new GcmNativeRegistration(mNotificationHubPath);
 		}
 
 		result.loadXml(response, mNotificationHubPath);
@@ -546,4 +487,7 @@ public class NotificationHub {
 		mIsRefreshNeeded = true;
 	}
 
+	private boolean isTemplateRegistration(String xml){
+		return xml.contains("<" + GcmTemplateRegistration.GCM_TEMPLATE_REGISTRATION_CUSTOM_NODE);
+	}
 }

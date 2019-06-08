@@ -45,17 +45,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public abstract class Registration {
-	
-	public enum RegistrationType
-	{
-		unknown,
-		gcm,
-		adm,
-		baidu
-	}
-
-	public RegistrationType mRegistrationType;
-
 	/**
 	 * Name for default registration
 	 */
@@ -282,20 +271,6 @@ public abstract class Registration {
 		mNotificationHubPath = notificationHubPath;
 	}
 
-	/**
-	 * Gets the registration type
-	 */
-	public RegistrationType getRegistrationType() {
-		return mRegistrationType;
-	}
-
-	/**
-	 * Sets the registration type
-	 */
-	void setRegistrationType(RegistrationType type) {
-		mRegistrationType = type;
-	}
-	
 	/**
 	 * Gets the registration ID
 	 */
