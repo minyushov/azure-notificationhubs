@@ -135,7 +135,6 @@ class Connection {
    * @param contentType The request content type
    * @param method      The request method
    * @return The response content body
-   * @throws Exception
    */
   String executeRequest(String resource, String content, String contentType, String method) throws Exception {
     return executeRequest(resource, content, contentType, method, null, null);
@@ -150,7 +149,6 @@ class Connection {
    * @param method       The request method
    * @param extraHeaders Extra headers to include in the request
    * @return The response content body
-   * @throws Exception
    */
   String executeRequest(String resource, String content, String contentType, String method, Map<String, String> extraHeaders) throws Exception {
     return executeRequest(resource, content, contentType, method, null, extraHeaders);
@@ -165,7 +163,6 @@ class Connection {
    * @param method           The request method
    * @param targetHeaderName The header name when we need to get value from it in instead of content
    * @return The response content body
-   * @throws Exception
    */
   String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName) throws Exception {
     return executeRequest(resource, content, contentType, method, targetHeaderName, null);
@@ -181,7 +178,6 @@ class Connection {
    * @param targetHeaderName The header name when we need to get value from it in instead of content
    * @param extraHeaders     Extra headers to include in the request
    * @return The response content body
-   * @throws Exception
    */
   private String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName, Map<String, String> extraHeaders) throws Exception {
     URI endpointURI = URI.create(mConnectionData.get(ENDPOINT_KEY));
@@ -243,7 +239,6 @@ class Connection {
    * @param request          The request to execute
    * @param targetHeaderName The header name when we need to get value from it in instead of content
    * @return The content string or header value
-   * @throws Exception
    */
   private String executeRequest(Request request, String targetHeaderName) throws Exception {
     int status;
@@ -285,7 +280,6 @@ class Connection {
    *
    * @param response The response to read
    * @return The content string
-   * @throws java.io.IOException
    */
   private String getResponseContent(Response response) throws IOException {
     ResponseBody responseBody = response.body();
@@ -301,7 +295,6 @@ class Connection {
    *
    * @param url The target URL
    * @return An AuthToken
-   * @throws java.security.InvalidKeyException
    */
   private String generateAuthToken(String url) throws InvalidKeyException {
     String keyName = mConnectionData.get(SHARED_ACCESS_KEY_NAME);

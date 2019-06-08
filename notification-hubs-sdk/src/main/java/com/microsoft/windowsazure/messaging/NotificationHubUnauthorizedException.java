@@ -25,9 +25,6 @@ package com.microsoft.windowsazure.messaging;
  */
 public class NotificationHubUnauthorizedException extends NotificationHubException {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = -5926583893712403416L;
 
   /**

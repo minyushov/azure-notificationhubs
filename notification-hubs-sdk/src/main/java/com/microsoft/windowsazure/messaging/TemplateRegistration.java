@@ -53,9 +53,6 @@ public abstract class TemplateRegistration extends Registration {
 
   /**
    * Appends the template body to a registration xml
-   *
-   * @param doc
-   * @param templateRegistrationDescription
    */
   private void appendBodyTemplateNode(Document doc, Element templateRegistrationDescription) {
     if (!Utils.isNullOrWhiteSpace(getBodyTemplate())) {

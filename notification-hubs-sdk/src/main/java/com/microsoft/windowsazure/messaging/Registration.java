@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -107,8 +108,6 @@ public abstract class Registration {
 
   /**
    * Creates an XML representation of the Registration
-   *
-   * @throws Exception
    */
   String toXml() throws Exception {
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -174,14 +173,14 @@ public abstract class Registration {
   protected void appendTagsNode(Document doc, Element registrationDescription) {
     List<String> tagList = getTags();
     if (tagList != null && tagList.size() > 0) {
-      String tagsNodeValue = tagList.get(0);
+      StringBuilder tagsNodeValue = new StringBuilder(tagList.get(0));
 
       for (int i = 1; i < tagList.size(); i++) {
-        tagsNodeValue += "," + tagList.get(i);
+        tagsNodeValue.append(",").append(tagList.get(i));
       }
 
       Element tags = doc.createElement("Tags");
-      tags.appendChild(doc.createTextNode(tagsNodeValue));
+      tags.appendChild(doc.createTextNode(tagsNodeValue.toString()));
       registrationDescription.appendChild(tags);
     }
   }
@@ -207,7 +206,6 @@ public abstract class Registration {
    *
    * @param xml                 The xml to read
    * @param notificationHubPath The notificationHubPath
-   * @throws Exception
    */
   void loadXml(String xml, String notificationHubPath) throws Exception {
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -232,9 +230,7 @@ public abstract class Registration {
         tags = tags.trim();
         String[] tagList = tags.split(",");
 
-        for (String tag : tagList) {
-          mTags.add(tag);
-        }
+        Collections.addAll(mTags, tagList);
       }
 
       loadCustomXmlData(payloadNode);
@@ -356,7 +352,6 @@ public abstract class Registration {
    *
    * @param dateString The date string to parse
    * @return The Date object
-   * @throws java.text.ParseException
    */
   private static Date UTCDateStringToDate(String dateString) throws ParseException {
     // Change Z to +00:00 to adapt the string to a format
@@ -373,16 +368,11 @@ public abstract class Registration {
     // Parse the well-formatted date string
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.'SSSZ", Locale.getDefault());
     dateFormat.setTimeZone(TimeZone.getDefault());
-    Date date = dateFormat.parse(s);
-
-    return date;
-
+    return dateFormat.parse(s);
   }
 
   /**
    * Gets the update date
-   *
-   * @throws java.text.ParseException
    */
   Date getUpdated() throws ParseException {
     return UTCDateStringToDate(mUpdated);
@@ -418,8 +408,6 @@ public abstract class Registration {
 
   /**
    * Gets the expiration time
-   *
-   * @throws java.text.ParseException
    */
   public Date getExpirationTime() throws ParseException {
     return UTCDateStringToDate(mExpirationTime);
@@ -454,8 +442,6 @@ public abstract class Registration {
 
   /**
    * Gets the registration information JSON object
-   *
-   * @throws org.json.JSONException
    */
   JSONObject getRegistrationInformation() throws JSONException {
     JSONObject regInfo = new JSONObject();

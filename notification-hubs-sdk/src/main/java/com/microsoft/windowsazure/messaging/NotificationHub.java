@@ -129,7 +129,6 @@ public class NotificationHub {
    * @param pnsHandle PNS specific identifier
    * @param tags      Tags to use in the registration
    * @return The created registration
-   * @throws Exception
    */
   public Registration register(String pnsHandle, String... tags) throws Exception {
     if (isNullOrWhiteSpace(pnsHandle)) {
@@ -152,7 +151,6 @@ public class NotificationHub {
    * @param template     The template body
    * @param tags         The tags to use in the registration
    * @return The created registration
-   * @throws Exception
    */
   public TemplateRegistration registerTemplate(String pnsHandle, String templateName, String template, String... tags) throws Exception {
     if (isNullOrWhiteSpace(pnsHandle)) {
@@ -178,8 +176,6 @@ public class NotificationHub {
 
   /**
    * Unregisters the client for native notifications
-   *
-   * @throws Exception
    */
   public void unregister() throws Exception {
     unregisterInternal(Registration.DEFAULT_REGISTRATION_NAME);
@@ -189,7 +185,6 @@ public class NotificationHub {
    * Unregisters the client for template notifications of a specific template
    *
    * @param templateName The template name
-   * @throws Exception
    */
   public void unregisterTemplate(String templateName) throws Exception {
     if (isNullOrWhiteSpace(templateName)) {
@@ -203,7 +198,6 @@ public class NotificationHub {
    * Unregisters the client for all notifications
    *
    * @param pnsHandle PNS specific identifier
-   * @throws Exception
    */
   public void unregisterAll(String pnsHandle) throws Exception {
     refreshRegistrationInformation(pnsHandle);
@@ -234,7 +228,7 @@ public class NotificationHub {
       }
     }
 
-    editor.commit();
+    editor.apply();
 
     // get existing registrations
     Connection conn = new Connection(mConnectionString);
@@ -327,7 +321,6 @@ public class NotificationHub {
    *
    * @param registration The registration to create
    * @return The created registration
-   * @throws Exception
    */
   private Registration registerInternal(Registration registration) throws Exception {
 
@@ -363,7 +356,6 @@ public class NotificationHub {
    * Deletes a registration and removes it from local storage
    *
    * @param registrationName The registration name
-   * @throws Exception
    */
   private void unregisterInternal(String registrationName) throws Exception {
     String registrationId = retrieveRegistrationId(registrationName);
@@ -378,7 +370,6 @@ public class NotificationHub {
    *
    * @param registration The registration to update
    * @return The updated registration
-   * @throws Exception
    */
   private Registration upsertRegistrationInternal(Registration registration) throws Exception {
     Connection conn = new Connection(mConnectionString);
@@ -410,15 +401,12 @@ public class NotificationHub {
 
     URI regIdUri = new URI(response);
     String[] pathFragments = regIdUri.getPath().split("/");
-    String result = pathFragments[pathFragments.length - 1];
 
-    return result;
+    return pathFragments[pathFragments.length - 1];
   }
 
   /**
    * Deletes a registration and removes it from local storage
-   *
-   * @throws Exception
    */
   private void deleteRegistrationInternal(String registrationName, String registrationId) throws Exception {
     Connection conn = new Connection(mConnectionString);
@@ -436,7 +424,6 @@ public class NotificationHub {
    *
    * @param registrationName The registration name to look for in local storage
    * @return A registration id String
-   * @throws Exception
    */
   private String retrieveRegistrationId(String registrationName) throws Exception {
     return mSharedPreferences.getString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, null);
@@ -447,7 +434,6 @@ public class NotificationHub {
    *
    * @param registrationName The registration name to store in local storage
    * @param registrationId   The registration id to store in local storage
-   * @throws Exception
    */
   private void storeRegistrationId(String registrationName, String registrationId, String pNSHandle) throws Exception {
     Editor editor = mSharedPreferences.edit();
@@ -459,21 +445,20 @@ public class NotificationHub {
     // Always overwrite the storage version with the latest value
     editor.putString(STORAGE_PREFIX + STORAGE_VERSION_KEY, STORAGE_VERSION);
 
-    editor.commit();
+    editor.apply();
   }
 
   /**
    * Removes the registration name and id association from local storage
    *
    * @param registrationName The registration name of the association to remove from local storage
-   * @throws Exception
    */
   private void removeRegistrationId(String registrationName) throws Exception {
     Editor editor = mSharedPreferences.edit();
 
     editor.remove(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName);
 
-    editor.commit();
+    editor.apply();
   }
 
   private void verifyStorageVersion() {
@@ -491,7 +476,7 @@ public class NotificationHub {
       }
     }
 
-    editor.commit();
+    editor.apply();
 
     mIsRefreshNeeded = true;
   }
