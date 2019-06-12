@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 /**
  * Represents GCM native registration
  */
-public class GcmNativeRegistration extends Registration {
+class GcmNativeRegistration extends Registration {
 
   /**
    * Custom payload node name for native registrations

@@ -25,19 +25,16 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-import java.io.IOException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Set;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -237,12 +234,7 @@ public class NotificationHub {
     String response = conn.executeRequest(resource, content, XML_CONTENT_TYPE, "GET");
 
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    builder.setEntityResolver(new EntityResolver() {
-      @Override
-      public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-        return null;
-      }
-    });
+    builder.setEntityResolver((publicId, systemId) -> null);
 
     Document doc = builder.parse(new InputSource(new StringReader(response)));
 

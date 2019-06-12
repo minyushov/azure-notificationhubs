@@ -42,7 +42,7 @@ class ConnectionStringParser {
    * @param connectionString The connection string to parse
    * @return A Map with the properties and values defined in the connection string
    */
-  public static Map<String, String> parse(String connectionString) {
+  static Map<String, String> parse(String connectionString) {
     ConnectionStringParser connectionStringParser = new ConnectionStringParser(connectionString);
     return connectionStringParser.parse();
   }
