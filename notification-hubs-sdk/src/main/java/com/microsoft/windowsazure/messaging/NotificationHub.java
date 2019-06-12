@@ -89,19 +89,19 @@ public class NotificationHub {
   /**
    * The Notification Hub path
    */
-  private String mNotificationHubPath;
+  private String notificationHubPath;
 
   /**
    * Notification Hub Connection String
    */
-  private String mConnectionString;
+  private String connectionString;
 
   /**
    * SharedPreferences reference used to access local storage
    */
-  private SharedPreferences mSharedPreferences;
+  private SharedPreferences sharedPreferences;
 
-  private boolean mIsRefreshNeeded = false;
+  private boolean isRefreshNeeded = false;
 
   /**
    * Creates a new NotificationHub client
@@ -118,7 +118,7 @@ public class NotificationHub {
       throw new IllegalArgumentException("context");
     }
 
-    mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
     verifyStorageVersion();
   }
@@ -135,7 +135,7 @@ public class NotificationHub {
       throw new IllegalArgumentException("pnsHandle");
     }
 
-    Registration registration = new GcmNativeRegistration(mNotificationHubPath);
+    Registration registration = new GcmNativeRegistration(notificationHubPath);
     registration.setPNSHandle(pnsHandle);
     registration.setName(Registration.DEFAULT_REGISTRATION_NAME);
     registration.addTags(tags);
@@ -165,7 +165,7 @@ public class NotificationHub {
       throw new IllegalArgumentException("template");
     }
 
-    TemplateRegistration registration = new GcmTemplateRegistration(mNotificationHubPath);
+    TemplateRegistration registration = new GcmTemplateRegistration(notificationHubPath);
     registration.setPNSHandle(pnsHandle);
     registration.setName(templateName);
     registration.setBodyTemplate(template);
@@ -202,12 +202,12 @@ public class NotificationHub {
   public void unregisterAll(String pnsHandle) throws Exception {
     refreshRegistrationInformation(pnsHandle);
 
-    Set<String> keys = mSharedPreferences.getAll().keySet();
+    Set<String> keys = sharedPreferences.getAll().keySet();
 
     for (String key : keys) {
       if (key.startsWith(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY)) {
         String registrationName = key.substring((STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY).length());
-        String registrationId = mSharedPreferences.getString(key, "");
+        String registrationId = sharedPreferences.getString(key, "");
 
         deleteRegistrationInternal(registrationName, registrationId);
       }
@@ -220,8 +220,8 @@ public class NotificationHub {
     }
 
     // delete old registration information
-    Editor editor = mSharedPreferences.edit();
-    Set<String> keys = mSharedPreferences.getAll().keySet();
+    Editor editor = sharedPreferences.edit();
+    Set<String> keys = sharedPreferences.getAll().keySet();
     for (String key : keys) {
       if (key.startsWith(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY)) {
         editor.remove(key);
@@ -231,11 +231,11 @@ public class NotificationHub {
     editor.apply();
 
     // get existing registrations
-    Connection conn = new Connection(mConnectionString);
+    Connection conn = new Connection(connectionString);
 
     String filter = GcmNativeRegistration.GCM_HANDLE_NODE + " eq '" + pnsHandle + "'";
 
-    String resource = mNotificationHubPath + "/Registrations/?$filter=" + URLEncoder.encode(filter, "UTF-8");
+    String resource = notificationHubPath + "/Registrations/?$filter=" + URLEncoder.encode(filter, "UTF-8");
     String content = null;
     String response = conn.executeRequest(resource, content, XML_CONTENT_TYPE, "GET");
 
@@ -259,24 +259,24 @@ public class NotificationHub {
       Element entry = (Element) entries.item(i);
       String xml = getXmlString(entry);
       if (isTemplateRegistration(xml)) {
-        registration = new GcmTemplateRegistration(mNotificationHubPath);
+        registration = new GcmTemplateRegistration(notificationHubPath);
       } else {
-        registration = new GcmNativeRegistration(mNotificationHubPath);
+        registration = new GcmNativeRegistration(notificationHubPath);
       }
 
-      registration.loadXml(xml, mNotificationHubPath);
+      registration.loadXml(xml, notificationHubPath);
 
       storeRegistrationId(registration.getName(), registration.getRegistrationId(), registration.getPNSHandle());
     }
 
-    mIsRefreshNeeded = false;
+    isRefreshNeeded = false;
   }
 
   /**
    * Gets the Notification Hub connection string
    */
   public String getConnectionString() {
-    return mConnectionString;
+    return connectionString;
   }
 
   /**
@@ -294,14 +294,14 @@ public class NotificationHub {
       throw new IllegalArgumentException("connectionString", e);
     }
 
-    mConnectionString = connectionString;
+    this.connectionString = connectionString;
   }
 
   /**
    * Gets the Notification Hub path
    */
   public String getNotificationHubPath() {
-    return mNotificationHubPath;
+    return notificationHubPath;
   }
 
   /**
@@ -313,7 +313,7 @@ public class NotificationHub {
       throw new IllegalArgumentException("notificationHubPath");
     }
 
-    mNotificationHubPath = notificationHubPath;
+    this.notificationHubPath = notificationHubPath;
   }
 
   /**
@@ -324,8 +324,8 @@ public class NotificationHub {
    */
   private Registration registerInternal(Registration registration) throws Exception {
 
-    if (mIsRefreshNeeded) {
-      String pNSHandle = mSharedPreferences.getString(STORAGE_PREFIX + PNS_HANDLE_KEY, "");
+    if (isRefreshNeeded) {
+      String pNSHandle = sharedPreferences.getString(STORAGE_PREFIX + PNS_HANDLE_KEY, "");
 
       if (isNullOrWhiteSpace(pNSHandle)) {
         pNSHandle = registration.getPNSHandle();
@@ -372,7 +372,7 @@ public class NotificationHub {
    * @return The updated registration
    */
   private Registration upsertRegistrationInternal(Registration registration) throws Exception {
-    Connection conn = new Connection(mConnectionString);
+    Connection conn = new Connection(connectionString);
 
     String resource = registration.getURI();
     String content = registration.toXml();
@@ -381,12 +381,12 @@ public class NotificationHub {
 
     Registration result;
     if (isTemplateRegistration(response)) {
-      result = new GcmTemplateRegistration(mNotificationHubPath);
+      result = new GcmTemplateRegistration(notificationHubPath);
     } else {
-      result = new GcmNativeRegistration(mNotificationHubPath);
+      result = new GcmNativeRegistration(notificationHubPath);
     }
 
-    result.loadXml(response, mNotificationHubPath);
+    result.loadXml(response, notificationHubPath);
 
     storeRegistrationId(result.getName(), result.getRegistrationId(), registration.getPNSHandle());
 
@@ -394,9 +394,9 @@ public class NotificationHub {
   }
 
   private String createRegistrationId() throws Exception {
-    Connection conn = new Connection(mConnectionString);
+    Connection conn = new Connection(connectionString);
 
-    String resource = mNotificationHubPath + "/registrationids/";
+    String resource = notificationHubPath + "/registrationids/";
     String response = conn.executeRequest(resource, null, XML_CONTENT_TYPE, "POST", NEW_REGISTRATION_LOCATION_HEADER);
 
     URI regIdUri = new URI(response);
@@ -409,8 +409,8 @@ public class NotificationHub {
    * Deletes a registration and removes it from local storage
    */
   private void deleteRegistrationInternal(String registrationName, String registrationId) throws Exception {
-    Connection conn = new Connection(mConnectionString);
-    String resource = mNotificationHubPath + "/Registrations/" + registrationId;
+    Connection conn = new Connection(connectionString);
+    String resource = notificationHubPath + "/Registrations/" + registrationId;
 
     try {
       conn.executeRequest(resource, null, XML_CONTENT_TYPE, "DELETE", Collections.singletonMap("If-Match", "*"));
@@ -426,7 +426,7 @@ public class NotificationHub {
    * @return A registration id String
    */
   private String retrieveRegistrationId(String registrationName) throws Exception {
-    return mSharedPreferences.getString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, null);
+    return sharedPreferences.getString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, null);
   }
 
   /**
@@ -436,7 +436,7 @@ public class NotificationHub {
    * @param registrationId   The registration id to store in local storage
    */
   private void storeRegistrationId(String registrationName, String registrationId, String pNSHandle) throws Exception {
-    Editor editor = mSharedPreferences.edit();
+    Editor editor = sharedPreferences.edit();
 
     editor.putString(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName, registrationId);
 
@@ -454,7 +454,7 @@ public class NotificationHub {
    * @param registrationName The registration name of the association to remove from local storage
    */
   private void removeRegistrationId(String registrationName) throws Exception {
-    Editor editor = mSharedPreferences.edit();
+    Editor editor = sharedPreferences.edit();
 
     editor.remove(STORAGE_PREFIX + REGISTRATION_NAME_STORAGE_KEY + registrationName);
 
@@ -462,12 +462,12 @@ public class NotificationHub {
   }
 
   private void verifyStorageVersion() {
-    String currentStorageVersion = mSharedPreferences.getString(STORAGE_PREFIX + STORAGE_VERSION_KEY, "");
+    String currentStorageVersion = sharedPreferences.getString(STORAGE_PREFIX + STORAGE_VERSION_KEY, "");
 
-    Editor editor = mSharedPreferences.edit();
+    Editor editor = sharedPreferences.edit();
 
     if (!currentStorageVersion.equals(STORAGE_VERSION)) {
-      Set<String> keys = mSharedPreferences.getAll().keySet();
+      Set<String> keys = sharedPreferences.getAll().keySet();
 
       for (String key : keys) {
         if (key.startsWith(STORAGE_PREFIX)) {
@@ -478,7 +478,7 @@ public class NotificationHub {
 
     editor.apply();
 
-    mIsRefreshNeeded = true;
+    isRefreshNeeded = true;
   }
 
   private boolean isTemplateRegistration(String xml) {

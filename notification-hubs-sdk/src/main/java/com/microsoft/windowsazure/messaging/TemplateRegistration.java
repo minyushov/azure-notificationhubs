@@ -34,7 +34,7 @@ public abstract class TemplateRegistration extends Registration {
   /**
    * The template body
    */
-  private String mBodyTemplate;
+  private String bodyTemplate;
 
   /**
    * Creates a new template registration
@@ -72,7 +72,7 @@ public abstract class TemplateRegistration extends Registration {
       for (int i = 0; i < bodyNodes.getLength(); i++) {
         if (bodyNodes.item(i) instanceof CharacterData) {
           CharacterData data = (CharacterData) bodyNodes.item(i);
-          mBodyTemplate = data.getData();
+          bodyTemplate = data.getData();
           break;
         }
       }
@@ -85,14 +85,14 @@ public abstract class TemplateRegistration extends Registration {
    * Gets the template body
    */
   public String getBodyTemplate() {
-    return mBodyTemplate;
+    return bodyTemplate;
   }
 
   /**
    * Sets the template body
    */
   void setBodyTemplate(String bodyTemplate) {
-    mBodyTemplate = bodyTemplate;
+    this.bodyTemplate = bodyTemplate;
   }
 
   /**

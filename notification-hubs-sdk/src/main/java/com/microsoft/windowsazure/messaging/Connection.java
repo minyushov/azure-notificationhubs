@@ -107,7 +107,7 @@ class Connection {
   /**
    * Connection data retrieved from connection string
    */
-  private Map<String, String> mConnectionData;
+  private Map<String, String> connectionData;
 
   private final OkHttpClient client;
 
@@ -117,7 +117,7 @@ class Connection {
    * @param connectionString The connection string
    */
   Connection(String connectionString) {
-    mConnectionData = ConnectionStringParser.parse(connectionString);
+    connectionData = ConnectionStringParser.parse(connectionString);
 
     OkHttpClient.Builder builder = new OkHttpClient.Builder();
     builder.connectTimeout(30, TimeUnit.SECONDS);
@@ -180,7 +180,7 @@ class Connection {
    * @return The response content body
    */
   private String executeRequest(String resource, String content, String contentType, String method, String targetHeaderName, Map<String, String> extraHeaders) throws Exception {
-    URI endpointURI = URI.create(mConnectionData.get(ENDPOINT_KEY));
+    URI endpointURI = URI.create(connectionData.get(ENDPOINT_KEY));
     String scheme = endpointURI.getScheme();
 
     // Replace the scheme with "https"
@@ -297,12 +297,12 @@ class Connection {
    * @return An AuthToken
    */
   private String generateAuthToken(String url) throws InvalidKeyException {
-    String keyName = mConnectionData.get(SHARED_ACCESS_KEY_NAME);
+    String keyName = connectionData.get(SHARED_ACCESS_KEY_NAME);
     if (isNullOrWhiteSpace(keyName)) {
       throw new AssertionError("SharedAccessKeyName");
     }
 
-    String key = mConnectionData.get(SHARED_ACCESS_KEY);
+    String key = connectionData.get(SHARED_ACCESS_KEY);
     if (isNullOrWhiteSpace(key)) {
       throw new AssertionError("SharedAccessKey");
     }

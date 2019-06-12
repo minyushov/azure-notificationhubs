@@ -64,47 +64,47 @@ public abstract class Registration {
   /**
    * The Registration Id
    */
-  protected String mRegistrationId;
+  protected String registrationId;
 
   /**
    * The Notification hub path
    */
-  protected String mNotificationHubPath;
+  protected String notificationHubPath;
 
   /**
    * The expiration time
    */
-  protected String mExpirationTime;
+  protected String expirationTime;
 
   /**
    * The PNS specific identifier
    */
-  protected String mPNSHandle;
+  protected String pnsHandle;
 
   /**
    * The registration name
    */
-  protected String mName;
+  protected String name;
 
   /**
    * The registration tags
    */
-  protected List<String> mTags;
+  protected List<String> tags;
 
   /**
    * The registration URI
    */
-  protected String mURI;
+  protected String uri;
 
   /**
    * The registration updated date
    */
-  protected String mUpdated;
+  protected String updatedDate;
 
   /**
    * The registration ETag
    */
-  protected String mETag;
+  protected String etag;
 
   /**
    * Creates an XML representation of the Registration
@@ -214,23 +214,23 @@ public abstract class Registration {
     doc.getDocumentElement().normalize();
     Element root = doc.getDocumentElement();
 
-    mNotificationHubPath = notificationHubPath;
-    mUpdated = getNodeValue(root, "updated");
+    this.notificationHubPath = notificationHubPath;
+    updatedDate = getNodeValue(root, "updated");
 
     NodeList payloadNodes = doc.getElementsByTagName(getSpecificPayloadNodeName());
     if (payloadNodes.getLength() > 0) {
       Element payloadNode = (Element) payloadNodes.item(0);
-      mETag = getNodeValue(payloadNode, "ETag");
-      mExpirationTime = getNodeValue(payloadNode, "ExpirationTime");
-      mRegistrationId = getNodeValue(payloadNode, "RegistrationId");
-      mURI = notificationHubPath + "/Registrations/" + mRegistrationId;
+      etag = getNodeValue(payloadNode, "ETag");
+      expirationTime = getNodeValue(payloadNode, "ExpirationTime");
+      registrationId = getNodeValue(payloadNode, "RegistrationId");
+      uri = notificationHubPath + "/Registrations/" + registrationId;
 
       String tags = getNodeValue(payloadNode, "Tags");
       if (!isNullOrWhiteSpace(tags)) {
         tags = tags.trim();
         String[] tagList = tags.split(",");
 
-        Collections.addAll(mTags, tagList);
+        Collections.addAll(this.tags, tagList);
       }
 
       loadCustomXmlData(payloadNode);
@@ -273,78 +273,78 @@ public abstract class Registration {
    * @param notificationHubPath The notification hub path
    */
   Registration(String notificationHubPath) {
-    mTags = new ArrayList<String>();
-    mNotificationHubPath = notificationHubPath;
+    tags = new ArrayList<String>();
+    this.notificationHubPath = notificationHubPath;
   }
 
   /**
    * Gets the registration ID
    */
   public String getRegistrationId() {
-    return mRegistrationId;
+    return registrationId;
   }
 
   /**
    * Sets the registration ID
    */
   void setRegistrationId(String registrationId) {
-    mRegistrationId = registrationId;
+    this.registrationId = registrationId;
   }
 
   /**
    * Gets the notification hub path
    */
   public String getNotificationHubPath() {
-    return mNotificationHubPath;
+    return notificationHubPath;
   }
 
   /**
    * Sets the notification hub path
    */
   void setNotificationHubPath(String notificationHubPath) {
-    mNotificationHubPath = notificationHubPath;
+    this.notificationHubPath = notificationHubPath;
   }
 
   /**
    * Gets the registration name
    */
   String getName() {
-    return mName;
+    return name;
   }
 
   /**
    * Sets the registration name
    */
   void setName(String name) {
-    mName = name;
+    this.name = name;
   }
 
   /**
    * Gets the registration tags
    */
   public List<String> getTags() {
-    return new ArrayList<String>(mTags);
+    return new ArrayList<String>(tags);
   }
 
   /**
    * Gets the registration URI
    */
   public String getURI() {
-    return getNotificationHubPath() + "/Registrations/" + mRegistrationId;
+    return getNotificationHubPath() + "/Registrations/" + registrationId;
   }
 
   /**
    * Gets the registration ETag
    */
   String getETag() {
-    return mETag;
+    return etag;
   }
 
   /**
    * Sets the registration etag
    */
   void setETag(String eTag) {
-    mETag = eTag;
+    etag = eTag;
   }
 
   /**
@@ -375,56 +375,56 @@ public abstract class Registration {
    * Gets the update date
    */
   Date getUpdated() throws ParseException {
-    return UTCDateStringToDate(mUpdated);
+    return UTCDateStringToDate(updatedDate);
   }
 
   /**
    * Gets the updated date string
    */
   String getUpdatedString() {
-    return mUpdated;
+    return updatedDate;
   }
 
   /**
    * Sets the updated date string
    */
   void setUpdatedString(String updatedDateString) {
-    mUpdated = updatedDateString;
+    updatedDate = updatedDateString;
   }
 
   /**
    * Gets the PNS specific identifier
    */
   public String getPNSHandle() {
-    return mPNSHandle;
+    return pnsHandle;
   }
 
   /**
    * Sets the PNS specific identifier
    */
   void setPNSHandle(String pNSHandle) {
-    mPNSHandle = pNSHandle;
+    pnsHandle = pNSHandle;
   }
 
   /**
    * Gets the expiration time
    */
   public Date getExpirationTime() throws ParseException {
-    return UTCDateStringToDate(mExpirationTime);
+    return UTCDateStringToDate(expirationTime);
   }
 
   /**
    * Gets the expiration time string
    */
   String getExpirationTimeString() {
-    return mExpirationTime;
+    return expirationTime;
   }
 
   /**
    * Sets the expiration time string
    */
   void setExpirationTimeString(String expirationTimeString) {
-    mExpirationTime = expirationTimeString;
+    expirationTime = expirationTimeString;
   }
 
   /**
@@ -434,7 +434,7 @@ public abstract class Registration {
     if (tags != null) {
       for (String tag : tags) {
         if (!isNullOrWhiteSpace(tag)) {
-          mTags.add(tag);
+          this.tags.add(tag);
         }
       }
     }
