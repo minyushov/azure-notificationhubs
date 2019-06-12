@@ -48,8 +48,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.http.HttpMethod;
 
-import static com.microsoft.windowsazure.messaging.Utils.isNullOrWhiteSpace;
-
 /**
  * The connection with a Notification Hub server
  */
@@ -298,12 +296,12 @@ class Connection {
    */
   private String generateAuthToken(String url) throws InvalidKeyException {
     String keyName = connectionData.get(SHARED_ACCESS_KEY_NAME);
-    if (isNullOrWhiteSpace(keyName)) {
+    if (Utils.isNullOrWhiteSpace(keyName)) {
       throw new AssertionError("SharedAccessKeyName");
     }
 
     String key = connectionData.get(SHARED_ACCESS_KEY);
-    if (isNullOrWhiteSpace(key)) {
+    if (Utils.isNullOrWhiteSpace(key)) {
       throw new AssertionError("SharedAccessKey");
     }
 

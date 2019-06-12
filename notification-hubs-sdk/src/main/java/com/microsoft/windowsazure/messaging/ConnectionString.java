@@ -22,8 +22,6 @@ package com.microsoft.windowsazure.messaging;
 
 import java.net.URI;
 
-import static com.microsoft.windowsazure.messaging.Utils.*;
-
 /**
  * Connection string utilities to connect with a Notification Hub
  */
@@ -41,11 +39,11 @@ public class ConnectionString {
       throw new IllegalArgumentException("endPoint");
     }
 
-    if (isNullOrWhiteSpace(keyName)) {
+    if (Utils.isNullOrWhiteSpace(keyName)) {
       throw new IllegalArgumentException("keyName");
     }
 
-    if (isNullOrWhiteSpace(accessSecret)) {
+    if (Utils.isNullOrWhiteSpace(accessSecret)) {
       throw new IllegalArgumentException("accessSecret");
     }
 
@@ -60,7 +58,7 @@ public class ConnectionString {
    * @return The connection string
    */
   public static String createUsingSharedAccessKeyWithFullAccess(URI endPoint, String fullAccessSecret) {
-    if (isNullOrWhiteSpace(fullAccessSecret)) {
+    if (Utils.isNullOrWhiteSpace(fullAccessSecret)) {
       throw new IllegalArgumentException("fullAccessSecret");
     }
 
@@ -75,7 +73,7 @@ public class ConnectionString {
    * @return The connection string
    */
   public static String createUsingSharedAccessKeyWithListenAccess(URI endPoint, String listenAccessSecret) {
-    if (isNullOrWhiteSpace(listenAccessSecret)) {
+    if (Utils.isNullOrWhiteSpace(listenAccessSecret)) {
       throw new IllegalArgumentException("listenAccessSecret");
     }
 

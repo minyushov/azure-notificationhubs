@@ -42,9 +42,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import static com.microsoft.windowsazure.messaging.Utils.getXmlString;
-import static com.microsoft.windowsazure.messaging.Utils.isNullOrWhiteSpace;
-
 
 /**
  * The notification hub client
@@ -131,7 +128,7 @@ public class NotificationHub {
    * @return The created registration
    */
   public Registration register(String pnsHandle, String... tags) throws Exception {
-    if (isNullOrWhiteSpace(pnsHandle)) {
+    if (Utils.isNullOrWhiteSpace(pnsHandle)) {
       throw new IllegalArgumentException("pnsHandle");
     }
 
@@ -153,15 +150,15 @@ public class NotificationHub {
    * @return The created registration
    */
   public TemplateRegistration registerTemplate(String pnsHandle, String templateName, String template, String... tags) throws Exception {
-    if (isNullOrWhiteSpace(pnsHandle)) {
+    if (Utils.isNullOrWhiteSpace(pnsHandle)) {
       throw new IllegalArgumentException("pnsHandle");
     }
 
-    if (isNullOrWhiteSpace(templateName)) {
+    if (Utils.isNullOrWhiteSpace(templateName)) {
       throw new IllegalArgumentException("templateName");
     }
 
-    if (isNullOrWhiteSpace(template)) {
+    if (Utils.isNullOrWhiteSpace(template)) {
       throw new IllegalArgumentException("template");
     }
 
@@ -187,7 +184,7 @@ public class NotificationHub {
    * @param templateName The template name
    */
   public void unregisterTemplate(String templateName) throws Exception {
-    if (isNullOrWhiteSpace(templateName)) {
+    if (Utils.isNullOrWhiteSpace(templateName)) {
       throw new IllegalArgumentException("templateName");
     }
 
@@ -215,7 +212,7 @@ public class NotificationHub {
   }
 
   private void refreshRegistrationInformation(String pnsHandle) throws Exception {
-    if (isNullOrWhiteSpace(pnsHandle)) {
+    if (Utils.isNullOrWhiteSpace(pnsHandle)) {
       throw new IllegalArgumentException("pnsHandle");
     }
 
@@ -257,7 +254,7 @@ public class NotificationHub {
     for (int i = 0; i < entries.getLength(); i++) {
       Registration registration;
       Element entry = (Element) entries.item(i);
-      String xml = getXmlString(entry);
+      String xml = Utils.getXmlString(entry);
       if (isTemplateRegistration(xml)) {
         registration = new GcmTemplateRegistration(notificationHubPath);
       } else {
@@ -284,7 +281,7 @@ public class NotificationHub {
    */
   public void setConnectionString(String connectionString) {
 
-    if (isNullOrWhiteSpace(connectionString)) {
+    if (Utils.isNullOrWhiteSpace(connectionString)) {
       throw new IllegalArgumentException("connectionString");
     }
 
@@ -309,7 +306,7 @@ public class NotificationHub {
    */
   public void setNotificationHubPath(String notificationHubPath) {
 
-    if (isNullOrWhiteSpace(notificationHubPath)) {
+    if (Utils.isNullOrWhiteSpace(notificationHubPath)) {
       throw new IllegalArgumentException("notificationHubPath");
     }
 
@@ -327,7 +324,7 @@ public class NotificationHub {
     if (isRefreshNeeded) {
       String pNSHandle = sharedPreferences.getString(STORAGE_PREFIX + PNS_HANDLE_KEY, "");
 
-      if (isNullOrWhiteSpace(pNSHandle)) {
+      if (Utils.isNullOrWhiteSpace(pNSHandle)) {
         pNSHandle = registration.getPNSHandle();
       }
 
@@ -335,7 +332,7 @@ public class NotificationHub {
     }
 
     String registrationId = retrieveRegistrationId(registration.getName());
-    if (isNullOrWhiteSpace(registrationId)) {
+    if (Utils.isNullOrWhiteSpace(registrationId)) {
       registrationId = createRegistrationId();
     }
 
@@ -360,7 +357,7 @@ public class NotificationHub {
   private void unregisterInternal(String registrationName) throws Exception {
     String registrationId = retrieveRegistrationId(registrationName);
 
-    if (!isNullOrWhiteSpace(registrationId)) {
+    if (!Utils.isNullOrWhiteSpace(registrationId)) {
       deleteRegistrationInternal(registrationName, registrationId);
     }
   }

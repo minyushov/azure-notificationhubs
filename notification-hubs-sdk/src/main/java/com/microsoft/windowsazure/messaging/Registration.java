@@ -20,8 +20,6 @@ See the Apache Version 2.0 License for specific language governing permissions a
 
 package com.microsoft.windowsazure.messaging;
 
-import static com.microsoft.windowsazure.messaging.Utils.*;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
@@ -129,7 +127,7 @@ public abstract class Registration {
     appendNodeWithValue(doc, entry, "updated", getUpdatedString());
     appendContentNode(doc, entry);
 
-    return getXmlString(doc.getDocumentElement());
+    return Utils.getXmlString(doc.getDocumentElement());
   }
 
   /**
@@ -194,7 +192,7 @@ public abstract class Registration {
    * @param value         The node value
    */
   protected void appendNodeWithValue(Document doc, Element targetElement, String nodeName, String value) {
-    if (!isNullOrWhiteSpace(value)) {
+    if (!Utils.isNullOrWhiteSpace(value)) {
       Element newElement = doc.createElement(nodeName);
       newElement.appendChild(doc.createTextNode(value));
       targetElement.appendChild(newElement);
@@ -226,7 +224,7 @@ public abstract class Registration {
       uri = notificationHubPath + "/Registrations/" + registrationId;
 
       String tags = getNodeValue(payloadNode, "Tags");
-      if (!isNullOrWhiteSpace(tags)) {
+      if (!Utils.isNullOrWhiteSpace(tags)) {
         tags = tags.trim();
         String[] tagList = tags.split(",");
 
@@ -433,7 +431,7 @@ public abstract class Registration {
   void addTags(String[] tags) {
     if (tags != null) {
       for (String tag : tags) {
-        if (!isNullOrWhiteSpace(tag)) {
+        if (!Utils.isNullOrWhiteSpace(tag)) {
           this.tags.add(tag);
         }
       }
