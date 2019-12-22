@@ -19,7 +19,7 @@ dependencies {
   implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
 }
 
-bintrayUpload {
+bintray {
   dryRun = false
   repo = "azure"
   groupId = "com.minyushov.azure"
